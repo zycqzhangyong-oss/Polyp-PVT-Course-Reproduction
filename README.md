@@ -1,23 +1,76 @@
-# Polyp-PVT 课程复现代码
+# Polyp-PVT 课程复现
 
-本目录从本次提供的服务器代码包中整理，保留原有模型和训练器，不修改其计算逻辑。课程复现请选择 `--variant baseline`：`model.py` 中该分支直接实例化 `lib.pvt.PolypPVT`。其他分支替换了 CIM，属于扩展实验。
+本仓库复现 **Polyp-PVT: Polyp Segmentation with Pyramid Vision Transformers** 的核心网络，提供训练、预测、评价代码及五个测试集的实验结果。
 
-## 当前验证范围
+原版模型使用 PVTv2-B2 编码器、CFM、原 CIM、Similarity Aggregation Module 和两个预测头。运行时使用 `--variant baseline`；其他变体属于扩展实验，本页结果均来自原版 baseline。
 
-已检查服务器包的84个 Python 文件，语法均通过；两个核心网络文件的 AST 与包内 `reference.json` 一致。现已取得原版baseline真实运行结果，课程包10个记录源码文件的SHA256均与此次运行fingerprints一致。该检查不是此次重新访问官方仓库的独立上游版本核验。
+## 实验结果
 
-服务器导出的 `baseline_65imnwpy.zip` 已核验：原版baseline完成100轮，最佳epoch94，五集共798张，等权meanDic=0.8518218566、meanIoU=0.7889707799。当前包的 `results/` 附正式汇总CSV与论文对照；相邻附件 `PolypPVT_真实复现结果/` 含日志、配置、逐图结果和10组真实预测样例。本机未独立重跑训练。数据、预训练及训练权重仍在服务器，未放入本代码包。
+原版模型完成100轮训练，以内部验证集 soft Dice 选择第94轮权重，最佳验证 soft Dice 为 **0.9462947**。
 
-## 环境与准备
+| 测试集 | 图像数 | meanDic | meanIoU |
+|---|---:|---:|---:|
+| CVC-300 | 60 | 0.8704 | 0.8071 |
+| CVC-ClinicDB | 62 | 0.9305 | 0.8827 |
+| Kvasir | 100 | 0.9150 | 0.8619 |
+| CVC-ColonDB | 380 | 0.8040 | 0.7255 |
+| ETIS-LaribPolypDB | 196 | 0.7393 | 0.6676 |
+| 五集等权平均 | 798（总数） | **0.8518** | **0.7890** |
 
-历史服务器环境：Python 3.10.12，PyTorch 2.2.1+cu121，torchvision 0.17.1+cu121，timm 0.6.13，numpy 1.26.4，scipy 1.15.1，Pillow 11.1.0。`requirements.txt` 固定相应包版本；新机器需根据平台另行选择合适的 PyTorch 构建。已有服务器环境无需重新安装或升级。
+五集均值按数据集等权计算，不按图像数加权。验证集 soft Dice 与测试 meanDic 采用不同计算口径，分别报告。
 
-在项目根目录运行以下命令。将数据和 PVTv2-B2 预训练权重放置为：
+结果文件：
+
+- [五集完整指标](results/summary.csv)
+- [原论文结果对照与差值](results/paper_comparison.csv)
+- [运行配置与环境摘要](results/reproduction_summary.json)
+
+完整训练日志、逐图评价、10组真实预测样例和实际运行截图随课程报告提交。数据集、预训练权重及训练权重未包含在本仓库中。
+
+## 代码结构
 
 ```text
-lib/pvt.py
-lib/pvtv2.py
+README.md
+requirements.txt
+lib/
+  pvt.py
+  pvtv2.py
 polyp_pvt_md_v1/
+  model.py
+  run.py
+  protocol.py
+  prepare_data.py
+  md_block.py
+  reference.json
+  first_round.py
+  evaluation/
+results/
+代码核查.json
+```
+
+`model.py` 在 baseline 分支直接构建 `lib.pvt.PolypPVT`。`md_block.py` 为扩展分支提供模块，现有导入结构需要保留该文件。`first_round.py` 调度多个变体；复现本页原版结果时，使用下述 `run.py --variant baseline` 命令即可。
+
+课程代码的10份记录源码均与实际训练运行保存的 SHA256 一致，包括模型、训练器、骨干及评估器。该检查用于关联代码与运行记录，不构成对上游最新版本的独立核验。
+
+## 实验环境
+
+| 组件 | 实际运行版本 |
+|---|---|
+| Python | 3.10.12 |
+| PyTorch | 2.2.1+cu121 |
+| torchvision | 0.17.1+cu121 |
+| timm | 0.6.13 |
+| NumPy | 1.26.4 |
+| SciPy | 1.15.1 |
+| Pillow | 11.1.0 |
+
+训练日志记录设备为 CUDA。安装时先配置适合本机的 PyTorch 与 CUDA 运行环境，再按 `requirements.txt` 安装其余依赖；已有匹配环境可直接使用。
+
+## 数据与预训练权重
+
+参考[原作者项目](https://github.com/DengPingFan/Polyp-PVT)获取数据与 PVTv2-B2 预训练权重，按以下结构放置：
+
+```text
 pretrained_pth/pvt_v2_b2.pth
 dataset/TrainDataset/images/
 dataset/TrainDataset/masks/
@@ -25,17 +78,21 @@ dataset/TestDataset/<数据集名>/images/
 dataset/TestDataset/<数据集名>/masks/
 ```
 
-五个测试集名称是 `CVC-300`、`CVC-ClinicDB`、`Kvasir`、`CVC-ColonDB`、`ETIS-LaribPolypDB`。程序默认要求1450张训练池图像，测试集分别60、62、100、380、196张。配对图像与标注使用相同文件名主体。
+五个测试目录名与结果表一致。图像与对应标注使用相同文件名主体。程序默认检查训练池1450张及五个测试集的预期样本数。
 
-原方法及数据/权重获取说明参考原作者项目：<https://github.com/DengPingFan/Polyp-PVT>。本包不附数据或权重，不以随机权重替代预训练权重。历史记录的预训练 SHA256 为 `80711cd1b37ffba12bec6c7a2a7c54efe2315ed635e6d2055fd51c3e909ede4d`，需对实际文件核验。
+本次运行记录的 PVTv2-B2 预训练文件 SHA256 为：
 
-## 已有服务器项目
+```text
+80711cd1b37ffba12bec6c7a2a7c54efe2315ed635e6d2055fd51c3e909ede4d
+```
 
-如果已有 `runs/polyp_pvt_md_v1/data/report.json` 与冻结清单，先导出现有结果确认基线状态，复用原清单。不要重复准备数据，不必重训已经完成且协议相同的基线。不要将本精简目录覆盖到正在运行的项目中。
+已有 `runs/polyp_pvt_md_v1/data/report.json` 和冻结清单时，复用该划分；数据准备命令用于首次创建清单。
 
-## 在独立项目中从头运行
+## 运行方法
 
-以下仅是待执行命令，没有在本次 Mac 会话运行。`python` 应指向上述已配置好的环境。准备数据默认从1450张中留出10%内部验证集；首次生成后人工检查预览及报告。输出已存在时程序会拒绝覆盖。
+以下命令均在仓库根目录执行，`python` 指向已配置的运行环境。
+
+### 数据准备与流程检查
 
 ```bash
 python polyp_pvt_md_v1/prepare_data.py
@@ -43,32 +100,35 @@ python polyp_pvt_md_v1/run.py check --variant baseline
 python polyp_pvt_md_v1/run.py smoke --variant baseline
 ```
 
-`check` 会构建 baseline、spatial、multidomain 三个模型核对公共初始化，不会训练；`smoke` 只做一批真实样本的三尺度训练更新和两张验证图检查，其临时权重不作为正式结果。
+准备程序将1450张训练池图像划为1305张训练与145张内部验证，并保存数据检查报告及预览。已有清单时跳过首次准备步骤。
 
-确认检查通过且 GPU 可用后，正式训练：
+`check` 构建 baseline、spatial 和 multidomain，核对公共初始化；`smoke` 对一批真实样本执行三尺度更新并检查两张验证图，用于验证流程。
+
+### 训练与续训
 
 ```bash
 python -u polyp_pvt_md_v1/run.py train --variant baseline
 ```
 
-这会运行100轮。若只做一次流程检查，可在**新的运行目录**先使用：
+默认训练100轮，结果保存至：
+
+```text
+runs/polyp_pvt_md_v1/baseline_seed42/
+```
+
+中断后从检查点续训：
 
 ```bash
-python -u polyp_pvt_md_v1/run.py train --variant baseline --stop-after 1
 python -u polyp_pvt_md_v1/run.py train --variant baseline --resume
 ```
 
-第一条只完成计划100轮中的1轮，不能把它写成已完成正式训练。现有训练器仅允许计划全部完成后运行正式测试，因此本包没有把少轮流程检查冒充完整测试结果。
+训练器会核对续训的数据、源码、环境及配置指纹。`--stop-after 1` 可用于在完成一个额外epoch后保存检查点并暂停；正式测试要求完成计划的100轮训练。
 
-训练结束后生成五集预测：
+### 预测与评价
 
 ```bash
 python -u polyp_pvt_md_v1/run.py predict --variant baseline
-```
 
-然后评估（若实际测试目录不同，将 `--gt-root` 改为数据报告中的真实测试根目录）：
-
-```bash
 python -u polyp_pvt_md_v1/evaluation/evaluate.py \
   --project-root . \
   --pred-root runs/polyp_pvt_md_v1/baseline_seed42/predictions \
@@ -77,26 +137,28 @@ python -u polyp_pvt_md_v1/evaluation/evaluate.py \
   --workers 2
 ```
 
-预测和评估输出目录若已存在，应先检查结果，不要删除后盲目重跑。训练器也会检查续训时的数据、源码、环境和配置指纹。
+测试数据使用其他路径时，将 `--gt-root` 改为数据报告中的实际目录。预测和评价程序会检查已有输出，保留既有结果，避免覆盖。
 
 ## 训练与评价协议
 
-- 原网络结构：PVTv2-B2、CFM、原 CIM、Similarity Aggregation Module 和两个预测头。
-- 训练池1450张，通常分为1305训练与145内部验证；没有患者/视频ID时仅称图像级划分。
-- seed42、batch16、AdamW、学习率1e-4、weight decay 1e-4、恒定学习率、100轮，无额外增强。
-- 输入352，倍率0.75/1/1.25并按32对齐，实际尺寸256/352/448；每批每尺度更新一次。
-- 梯度裁剪为逐元素截断到[-0.5,0.5]，不是梯度范数裁剪。
-- 损失保留旧代码 `reduce='none'` 的实际行为：全局平均BCE加weighted IoU，两个预测头相加。不能描述成已经修正的逐像素weighted BCE。
-- 以内部验证原分辨率soft Dice选模；测试先输出uint8预测，再用UACANet Python评测器计算256阈值的meanDic/meanIoU等指标。
-- 当前Python评估器尚未证明与论文MATLAB评估逐项等价；与论文比较时披露训练池留出验证、选模和评测器差异。
+- 数据：1305张训练、145张内部验证、798张测试；未提供患者或视频ID，因此仅描述为图像级划分。
+- 优化：seed42、batch16、AdamW，学习率与 weight decay 均为1e-4；恒定学习率、100轮，无额外增强。
+- 输入：基准尺寸352，多尺度倍率0.75/1/1.25按32对齐，实际为256/352/448；每批每尺度更新一次。
+- 梯度：逐元素截断至 `[-0.5, 0.5]`。
+- 损失：保留旧 `reduce='none'` 参数的实际计算行为，每个预测头采用全局平均 BCE 加 weighted IoU，再将两个预测头损失相加。
+- 选模：内部验证集原分辨率 soft Dice 最大值对应的权重。
+- 预测：两个预测头 logits 相加，缩放至原分辨率后应用 sigmoid、逐图 min-max 归一化，再量化为 uint8。
+- 评价：使用 UACANet Python 指标实现，按256个阈值计算 meanDic、meanIoU 等指标。
 
+## 与原论文的协议差异
 
-## 来源与权利说明
+本次实现从1450张训练池另留145张内部验证，并按内部验证结果选模；Python评价器与原论文 MATLAB 评价尚未验证逐项等价。因此，`results/paper_comparison.csv` 中的差值用于描述复现差异，不作为严格同条件的方法优劣比较。
 
-原网络来源：<https://github.com/DengPingFan/Polyp-PVT>；评估器来源：<https://github.com/plemeri/UACANet>，保留 `evaluation/LICENSE-UACANet.txt`。`md_block.py` 用于扩展分支，baseline不使用该模块，但现有模块导入需要保留文件。
+本次仅报告 seed42，五集等权平均 meanDic 比论文报告值低约1.7978个百分点，meanIoU 低约1.4829个百分点；其中 ETIS 的 Dice 差距最大，约4.7691个百分点。数据划分、选模和评价实现均可能影响结果，现有单次运行不足以独立确定各因素的贡献。
 
-本次服务器导出包未包含原项目根目录LICENSE文件，因此未给原网络擅自指定许可证。第三方代码的使用与分发应遵循对应上游项目的授权声明。
+## 来源与授权
 
-## 保留辅助文件的原因
+- 原模型及骨干：[DengPingFan/Polyp-PVT](https://github.com/DengPingFan/Polyp-PVT)。
+- 评价指标实现：[plemeri/UACANet](https://github.com/plemeri/UACANet)。对应许可文本保留于 [LICENSE-UACANet.txt](polyp_pvt_md_v1/evaluation/LICENSE-UACANet.txt)。
 
-`first_round.py` 与原运行源码哈希一致，为保持源文件清单完整而保留；该脚本会调度多个变体。课程原版复现使用上述明确的 `run.py --variant baseline` 命令，不需要执行first_round.py。
+第三方代码的使用与分发遵循对应上游项目的授权声明；本仓库未为原网络另行指定许可证。
