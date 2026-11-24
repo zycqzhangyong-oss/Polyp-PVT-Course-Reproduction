@@ -1,0 +1,47 @@
+{
+  "variant": "baseline",
+  "status": "complete",
+  "completed_epoch": 100,
+  "best_epoch": 94,
+  "best_val_soft_dice": 0.9462947320419477,
+  "test_count": 798,
+  "dataset_macro_meanDic": 0.8518218566062689,
+  "dataset_macro_meanIoU": 0.7889707799168356,
+  "config": {
+    "epochs": 100,
+    "batch_size": 16,
+    "seed": 42,
+    "workers": 0,
+    "lr": 0.0001,
+    "weight_decay": 0.0001,
+    "clip_value": 0.5,
+    "size": 352,
+    "loss": "legacy_mean_bce_plus_weighted_iou",
+    "scales": [
+      0.75,
+      1.0,
+      1.25
+    ],
+    "optimizer": "AdamW",
+    "lr_schedule": "constant_for_100_epochs",
+    "augmentation": false,
+    "mask_policy": "original_grayscale_train255_valmax_testthreshold_v1",
+    "selection": "mean_original_resolution_soft_dice_on_internal_validation",
+    "variant": "baseline"
+  },
+  "environment": {
+    "python": "3.10.12",
+    "torch": "2.2.1+cu121",
+    "numpy": "1.26.4",
+    "timm": "0.6.13",
+    "pillow": "11.1.0",
+    "scipy": "1.15.1",
+    "torchvision": "0.17.1+cu121",
+    "cuda_runtime": "12.1"
+  },
+  "limitations": [
+    "1305 training and 145 internal validation images, compared with paper training pool of 1450.",
+    "UACANet Python evaluator; MATLAB equivalence not established.",
+    "Single seed; no patient/video independence claim."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "https://github.com/DengPingFan/Polyp-PVT",
+  "retrieved_date": "2026-10-26",
+  "ast_sha256": {
+    "lib/pvt.py": "92058c519bcfb7fc1f69a2d8119226fa3fc44d22cb2a654c496d2ea0936e4582",
+    "lib/pvtv2.py": "0beb8885213143d2552cc03976ffaa4e4ab9ee41a4169e497cfc36bef1d5eb21"
+  },
+  "download_sha256": {
+    "lib/pvt.py": "aa34ef3da7dcad9db95f757a3326e2b6b8839a14f7aadb34fab555bda4f0d1d9",
+    "lib/pvtv2.py": "bad9a96bca9841679b5f7a5a97bf9bbc4239611fb4be6d0ba0783f64e4f9dc8c",
+    "Train.py": "239fa5def119881193a830cac2430d9d9d87059f27cc1b58f0907b7eb42d9f70",
+    "dataloader.py": "194311c73c02423b8e24cb7481a54b8bb0e66a45283b239da1e8a4499045bdee",
+    "utils.py": "6df77cd0b850adeb33c1e990d558dbc7f7828a71e71854398d65e3baabf771d7"
+  }
+}

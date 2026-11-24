@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-24",
+  "archive_sha256": "51a77482778f9abe6b1703af96650d70999fa49677e362d8557eb98396308448",
+  "archive_files": 159,
+  "python_syntax_pass": 84,
+  "syntax_errors": [],
+  "baseline_ast_matches_bundled_reference": {
+    "lib/pvt.py": true,
+    "lib/pvtv2.py": true
+  },
+  "reference_scope": "Matches the reference.json supplied in the archive; no new independent upstream check.",
+  "runtime_test": "Server-supplied original-baseline evidence verified; 100 epochs, best 94, 798 test images. No independent local training rerun.",
+  "source_files": [
+    {
+      "file": "lib/pvt.py",
+      "sha256": "c61bfa2150a4f5848ac8f792d385b014631333bfb484e9236568d7b5f5cb112f"
+    },
+    {
+      "file": "lib/pvtv2.py",
+      "sha256": "76ff0349d88c6dc3db6b1e822fb81189a78c32ab810fbfef43536994f396abee"
+    },
+    {
+      "file": "polyp_pvt_md_v1/model.py",
+      "sha256": "be486ffd3b22900c3eec7f9ad98a3789c604ae93b31494697aa703e9cc6602d0"
+    },
+    {
+      "file": "polyp_pvt_md_v1/md_block.py",
+      "sha256": "7acd302063da77cf3de95d35111fb4d3b8c66785a7eaa77a63c1149b78b58912"
+    },
+    {
+      "file": "polyp_pvt_md_v1/run.py",
+      "sha256": "320ed98fe112f6cba96d466617c875d24cee3c038e2e5d4b894bf5d0b2fd68cd"
+    },
+    {
+      "file": "polyp_pvt_md_v1/protocol.py",
+      "sha256": "2fbc705841020ffe66ea4306f26efce46ef4a425d31909ab2d3a11356c3d773b"
+    },
+    {
+      "file": "polyp_pvt_md_v1/prepare_data.py",
+      "sha256": "65ff1f8914a8962494b4bb2fb895af5711b7028163f4fc5e4e987d8e517e5401"
+    },
+    {
+      "file": "polyp_pvt_md_v1/reference.json",
+      "sha256": "648179f5404b3937426f2aa5a56e79133605420523488267d87a0075a51722e5"
+    },
+    {
+      "file": "polyp_pvt_md_v1/evaluation/evaluate.py",
+      "sha256": "2670fcddd805f413b1c784cab6ef9a99748b34c12c510e3de612a73264bb1846"
+    },
+    {
+      "file": "polyp_pvt_md_v1/evaluation/uaca_eval_functions.py",
+      "sha256": "e8c6020ace49119949ac3ac8abc758af8266f5e416df48adde13cd8e8b20586e"
+    },
+    {
+      "file": "polyp_pvt_md_v1/evaluation/LICENSE-UACANet.txt",
+      "sha256": "220779c333587f5cd4c8c00124bdf318d59bc41ccbb3058e81cc54f404c2fdb1"
+    }
+  ],
+  "results_exporter_check": "Passed on synthetic temporary project: records selected, weights excluded, hashes verified, source bytes unchanged. Real server execution pending.",
+  "all_10_run_source_hashes_match": true
+}
