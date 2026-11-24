@@ -95,7 +95,7 @@ python -u polyp_pvt_md_v1/evaluation/evaluate.py \
 
 原网络来源：<https://github.com/DengPingFan/Polyp-PVT>；评估器来源：<https://github.com/plemeri/UACANet>，保留 `evaluation/LICENSE-UACANet.txt`。`md_block.py` 用于扩展分支，baseline不使用该模块，但现有模块导入需要保留文件。
 
-本次服务器导出包未包含原项目根目录LICENSE文件，因此未给原网络擅自指定许可证。公开GitHub前需一并核对上游授权并保留相应声明。
+本次服务器导出包未包含原项目根目录LICENSE文件，因此未给原网络擅自指定许可证。第三方代码的使用与分发应遵循对应上游项目的授权声明。
 
 ## 保留辅助文件的原因
 
