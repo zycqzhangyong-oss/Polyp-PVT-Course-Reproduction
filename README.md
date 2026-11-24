@@ -90,9 +90,6 @@ python -u polyp_pvt_md_v1/evaluation/evaluate.py \
 - 以内部验证原分辨率soft Dice选模；测试先输出uint8预测，再用UACANet Python评测器计算256阈值的meanDic/meanIoU等指标。
 - 当前Python评估器尚未证明与论文MATLAB评估逐项等价；与论文比较时披露训练池留出验证、选模和评测器差异。
 
-## 提交时应附
-
-GitHub仓库链接、本 README、代码、结果表、真实运行截图、输入/真值/预测示例，以及简短的论文结果对照分析。服务器训练结果位于 `runs/polyp_pvt_md_v1/baseline_seed42/`。正式结果已导出，汇总表与论文对照在本包 `results/`，完整证据在课程附件中。GitHub仓库尚未上传，需补仓库链接。
 
 ## 来源与权利说明
 
